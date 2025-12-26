@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Secure Session</title>
+
+<style>
+body{
+  margin:0;
+  background:black;
+  color:#00ff00;
+  font-family:monospace;
+  overflow:hidden;
+}
+canvas{position:fixed;inset:0;z-index:0;display:none}
+
+/* INTRO IMAGE */
+#introScreen{
+  position:fixed;
+  top:20%;
+  left:50%;
+  transform:translateX(-50%);
+  border:1px solid #00ff00;
+  padding:15px;
+  background:rgba(0,0,0,0.9);
+  z-index:5;
+}
+#introScreen img{width:500px}
+
+/* SCAN UI */
+#overlay{display:none;position:relative;z-index:2}
+h1{color:red;text-align:center}
+#terminal{
+  height:58vh;
+  overflow-y:auto;
+  padding:12px;
+  border-top:1px solid #00ff00;
+  background:rgba(0,0,0,0.65);
+  font-size:13px
+}
+</style>
+</head>
+
+<body>
+
+<div id="introScreen">
+  <img src="image.jpg" >
+</div>
+
+<canvas id="matrix"></canvas>
+
+<div id="overlay">
+  <h1>⚠ SECURE SYSTEM SCAN IN PROGRESS ⚠</h1>
+  <div id="terminal"></div>
+</div>
+
+<script>
+/* ---------- ONE-TIME CHECK ---------- */
+const scanDone = localStorage.getItem("scanDone");
+
+/* ---------- MATRIX ---------- */
+const canvas=document.getElementById("matrix");
+const ctx=canvas.getContext("2d");
+canvas.width=innerWidth; canvas.height=innerHeight;
+const chars="01ABCDEF",fs=16,cols=Math.floor(canvas.width/fs);
+const drops=Array(cols).fill(1);
+function drawMatrix(){
+  ctx.fillStyle="rgba(0,0,0,0.06)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#0f0"; ctx.font=fs+"px monospace";
+  drops.forEach((y,i)=>{
+    ctx.fillText(chars[Math.random()*chars.length|0],i*fs,y*fs);
+    if(y*fs>canvas.height && Math.random()>0.97) drops[i]=0;
+    drops[i]++;
+  });
+}
+
+/* ---------- TERMINAL ---------- */
+const terminal=document.getElementById("terminal");
+let printed=0;
+const MAX=1200;
+
+function flood(){
+  for(let i=0;i<30;i++){
+    if(printed>=MAX){ slowPhase(); return; }
+    terminal.innerHTML+="HEX: 0xuuhitjk98076vhgtckigddgyjvffu89"+Math.random().toString(16).substr(2,16)+"<br>";
+    printed++;
+  }
+  terminal.scrollTop=terminal.scrollHeight;
+  setTimeout(flood,20);
+}
+
+const slowLines=[
+  "Fetching information from phone...",
+  "Resolving SIM metadata...",
+  "Approximate location detected:agaram,kuppam",
+  "Generating device fingerprint...",
+  "phone no.:91107 94175",
+  "Date of birth:06/02/2007",
+  "generating device inside data",
+  "Finalizing device report..."
+];
+
+function slowPhase(){
+  let i=0;
+  function next(){
+    if(i>=slowLines.length){
+      localStorage.setItem("scanDone","yes");
+      setTimeout(()=>location.href="register.html",1500);
+      return;
+    }
+    terminal.innerHTML+=slowLines[i++]+"<br>";
+    terminal.scrollTop=terminal.scrollHeight;
+    setTimeout(next,1800);
+  }
+  next();
+}
+
+/* ---------- FLOW ---------- */
+window.onload=()=>{
+  if(scanDone==="yes"){
+    // show image only, no matrix
+    setTimeout(()=>location.href="register.html",10000);
+  }else{
+    setTimeout(()=>{
+      introScreen.style.display="none";
+      overlay.style.display="block";
+      canvas.style.display="block";   // matrix starts AFTER image
+      setInterval(drawMatrix,30);
+      flood();
+    },10000); // image time
+  }
+};
+</script>
+
+</body>
+</html>

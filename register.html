@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Account Status</title>
+
+<style>
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#e9eef3;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.container{
+  width:420px;
+  background:#ffffff;
+  border-radius:8px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.15);
+  padding:25px;
+}
+
+/* HEADINGS */
+h2{
+  text-align:center;
+  color:#0d47a1;
+  margin-bottom:8px;
+}
+.subtitle{
+  text-align:center;
+  font-size:13px;
+  color:#555;
+  margin-bottom:15px;
+}
+
+/* FORM */
+label{
+  font-size:13px;
+  color:#333;
+  display:block;
+  margin-top:10px;
+}
+input, select{
+  width:100%;
+  padding:10px;
+  margin-top:4px;
+  border:1px solid #ccc;
+  border-radius:4px;
+  font-size:14px;
+  background:#f9fbfd;
+}
+input[readonly]{
+  color:#222;
+}
+button{
+  width:100%;
+  margin-top:18px;
+  padding:12px;
+  background:#0d47a1;
+  color:white;
+  border:none;
+  border-radius:4px;
+  font-size:15px;
+}
+
+/* STATES */
+#form, #loading {
+  display:none;
+}
+#success{
+  display:none;
+  text-align:center;
+}
+
+/* LOADING */
+.spinner{
+  margin:20px auto;
+  width:32px;
+  height:32px;
+  border:4px solid #ccc;
+  border-top:4px solid #0d47a1;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
+
+/* SUCCESS DETAILS */
+.details{
+  text-align:left;
+  margin-top:15px;
+  font-size:14px;
+}
+.details div{
+  margin:6px 0;
+}
+.label{color:#555}
+.value{font-weight:bold}
+
+.footer{
+  margin-top:15px;
+  font-size:12px;
+  color:#777;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- REGISTRATION FORM -->
+  <div id="form">
+    <h2>Welcome to HSBC Hong kong shanghai banking</h2>
+    <h2>Bank Account Registration</h2>
+    <div class="subtitle">Please verify your details</div>
+
+    <label>Full Name</label>
+    <input type="text" value="T.Prashanth" readonly>
+    <label>Nationality</label>
+    <input type="nationality" value="INDIAN">
+
+    <label>Mobile Number</label>
+    <input type="text" value="+91 91107 94175" readonly>
+
+    <label>Email Address</label>
+    <input type="email" value="pr*******@gmail.com" readonly>
+    <label>Dob</label>
+    <input type="dob" value="06/02/2007" readonly>
+
+    <label>Account Type</label>
+    <select disabled>
+      <option selected>Bussiness Account</option>
+    </select>
+
+    <label>Preferred Branch</label>
+    <input type="text" value="Tsim sha Tsui City Branch" readonly>
+
+    <label>Customer Reference ID</label>
+    <input type="text" value="REF-BK-92X7A31" readonly>
+
+    <button disabled>Submit</button>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading">
+    <h2>Creating Account</h2>
+    <p class="subtitle">Please wait while we process your request</p>
+    <div class="spinner"></div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="success">
+    <h2>HSBC Banking services</h2>
+    <h2>Account Created Successfully</h2>
+    <p class="subtitle">Your account has been activated</p>
+
+    <div class="details">
+      <div><span class="label">Account holder name:</span>
+      <span class="value">T.Prashanth</span></div>
+      <div><span class="label">Account Number:</span>
+        <span class="value" id="acc"></span></div>
+
+      <div><span class="label">IFSC Code:</span>
+        <span class="value">HSBC0004821</span></div>
+
+      <div><span class="label">Customer ID:</span>
+        <span class="value" id="cid"></span></div>
+
+      <div><span class="label">Account Type:</span>
+        <span class="value">Bussiness Account</span></div>
+    </div>
+
+    
+  </div>
+
+  <div class="footer">
+    © Secure Banking Services
+  </div>
+
+</div>
+
+<script>
+function randomNumber(len){
+  let n="";
+  for(let i=0;i<len;i++) n+=Math.floor(Math.random()*10);
+  return n;
+}
+
+window.onload = () => {
+  const done = localStorage.getItem("accountCreated");
+
+  const form = document.getElementById("form");
+  const loading = document.getElementById("loading");
+  const success = document.getElementById("success");
+
+  // 🔁 IF ALREADY CREATED → ONLY SUCCESS
+  if(done === "yes"){
+    success.style.display = "block";
+    document.getElementById("acc").innerText =
+      localStorage.getItem("accNo");
+    document.getElementById("cid").innerText =
+      localStorage.getItem("custId");
+    return;
+  }
+
+  // 🟢 FIRST TIME FLOW
+  form.style.display = "block";
+
+  // Show form for 5 seconds
+  setTimeout(() => {
+    form.style.display = "none";
+    loading.style.display = "block";
+  }, 5000);
+
+  // Auto submit → success
+  setTimeout(() => {
+    loading.style.display = "none";
+    success.style.display = "block";
+
+    const acc = 338910506997;
+    const cid = "CUST" +682271;
+
+    document.getElementById("acc").innerText = acc;
+    document.getElementById("cid").innerText = cid;
+
+    // SAVE STATE
+    localStorage.setItem("accountCreated", "yes");
+    localStorage.setItem("accNo", acc);
+    localStorage.setItem("custId", cid);
+  }, 8500);
+};
+</script>
+
+</body>
+</html>
